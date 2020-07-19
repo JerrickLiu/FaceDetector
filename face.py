@@ -7,11 +7,14 @@ import argparse
 parser = argparse.ArgumentParser()
 
 parser.add_argument('--image_dir', type=str, default='/Users/SirJerrick/Desktop/images')
+parser.add_argument('--unknown_image_path', type=str, default='/Users/SirJerrick/Desktop/unknown_image/test.jpg')
 parser.add_argument('--names', nargs='+', default=None )
+parser.add_argument('--video', type=bool, default=False)
 args = parser.parse_args()
 
+if args.video:
 
-video_capture = cv2.VideoCapture(0)
+    video_capture = cv2.VideoCapture(0)
 
 
 def image_encoding(path):
@@ -23,6 +26,8 @@ def image_encoding(path):
     '''
 
     known_face_encodings = []
+
+
 
     for root, dirs, filename in os.walk(path):
         for file in filename:
@@ -38,7 +43,7 @@ def image_encoding(path):
 
 
 
-def classify():
+def classify_with_video():
 
     known_face_encodings = image_encoding(args.image_dir)
 
@@ -104,12 +109,61 @@ def classify():
         if cv2.waitKey(1) & 0xFF == ord('q'):
             break
 
+def classify_image(image):
+
+    img = cv2.imread(image)
+
+    known_face_encodings = image_encoding(args.image_dir)
+    known_face_names = args.names
+
+    face_locations = face_recognition.face_locations(img)
+    unknown_face_encodings = face_recognition.face_encodings(img, face_locations)
+
+    face_names = []
+
+    for unknown_face_encoding in unknown_face_encodings:
+        matches = face_recognition.compare_faces(known_face_encodings, unknown_face_encoding)
+        name = "Unknown"
+
+        # use the known face with the smallest distance to the new face
+        face_distances = face_recognition.face_distance(known_face_encodings, unknown_face_encoding)
+        best_match_index = np.argmin(face_distances)
+
+        if matches[best_match_index]:
+            name = known_face_names[best_match_index]
+
+        face_names.append(name)
+
+    for (top, right, bottom, left), name in zip(face_locations, face_names):
+
+
+        cv2.rectangle(img, (left, top), (right, bottom), (0, 0, 255), 2)
+
+        cv2.rectangle(img, (left, bottom - 35), (right, bottom), (0, 0, 255), cv2.FILLED)
+        font = cv2.FONT_HERSHEY_DUPLEX
+        cv2.putText(img, name, (left + 6, bottom - 6), font, 1.0, (255, 255, 255), 1)
+
+
+    while True:
+        cv2.namedWindow("Image", cv2.WINDOW_NORMAL)
+        cv2.resizeWindow("Image", 1000, 1000) # This you might want to play around with depending on the size if the unknown image
+        cv2.imshow("Image", img)
+
+        if cv2.waitKey(1) & 0xFF == ord('q'):
+            break
+
 
 def main():
 
-    classify()
-    video_capture.release()
-    cv2.destroyAllWindows()
+    if args.video:
+        classify_with_video()
+        video_capture.release()
+        cv2.destroyAllWindows()
+
+    else:
+        classify_image(args.unknown_image_path)
+
+
 
 
 if __name__ == '__main__':
