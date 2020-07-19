@@ -9,7 +9,7 @@ parser = argparse.ArgumentParser()
 
 parser.add_argument('--image_dir', type=str, default=None)
 parser.add_argument('--unknown_image_path', type=str, default=None)
-parser.add_argument('--names', nargs='+', default=None )
+parser.add_argument('--names', nargs='+', default=None)
 parser.add_argument('--video', type=bool, default=False)
 args = parser.parse_args()
 
