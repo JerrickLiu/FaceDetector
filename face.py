@@ -7,6 +7,7 @@ import argparse
 parser = argparse.ArgumentParser()
 
 parser.add_argument('--image_dir', type=str, default='/Users/SirJerrick/Desktop/images')
+parser.add_argument('--names', nargs='+', default=None )
 args = parser.parse_args()
 
 
@@ -41,7 +42,7 @@ def classify():
 
     known_face_encodings = image_encoding(args.image_dir)
 
-    known_face_names = ["Jerrick Liu"] #Add face names here
+    known_face_names = args.names
 
     process_this_frame = True
 
