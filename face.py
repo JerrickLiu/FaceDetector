@@ -3,6 +3,7 @@ import cv2
 import numpy as np
 import os
 import argparse
+import fnmatch
 
 parser = argparse.ArgumentParser()
 
@@ -26,7 +27,7 @@ def image_encoding(path):
     '''
 
     known_face_encodings = []
-
+    known_face_names = []
 
 
     for root, dirs, filename in os.walk(path):
@@ -36,11 +37,14 @@ def image_encoding(path):
                 face_image = face_recognition.load_image_file(new_path)
                 face_encoding = face_recognition.face_encodings(face_image)[0]
 
+                for name in args.names:
+                    if fnmatch.fnmatch(file, name + ".png") or fnmatch.fnmatch(file, name + ".jpg"): #Very hacky TODO Optimize this
+                        known_face_names.append(name)
+
 
                 known_face_encodings.append(face_encoding)
 
-                return known_face_encodings
-
+    return known_face_encodings, known_face_names
 
 
 def classify_with_video():
@@ -113,8 +117,7 @@ def classify_image(image):
 
     img = cv2.imread(image)
 
-    known_face_encodings = image_encoding(args.image_dir)
-    known_face_names = args.names
+    known_face_encodings, known_face_names = image_encoding(args.image_dir)
 
     face_locations = face_recognition.face_locations(img)
     unknown_face_encodings = face_recognition.face_encodings(img, face_locations)
@@ -149,7 +152,7 @@ def classify_image(image):
         cv2.resizeWindow("Image", 1000, 1000) # This you might want to play around with depending on the size if the unknown image
         cv2.imshow("Image", img)
 
-        if cv2.waitKey(1) & 0xFF == ord('q'):
+        if cv2.waitKey(1) & 0xFF == ord('q'): #Press q to quit!
             break
 
 
