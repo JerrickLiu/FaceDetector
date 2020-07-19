@@ -17,5 +17,5 @@ python3 face.py --video True --names Jerrick Liu --image_dir /path/to/images
 Or without video (the default is set to no video)
 
 ```python
-python3 face.py --image_dir /path/to/images --unknown_image_path /path/to/test/image --names Jerrick Liu
+python3 face.py --image_dir /path/to/images --unknown_image_path /path/to/test/image --names "Jerrick Liu"
 ```
