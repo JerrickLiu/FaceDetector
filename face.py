@@ -10,7 +10,7 @@ parser = argparse.ArgumentParser()
 parser.add_argument('--image_dir', type=str, default=None)
 parser.add_argument('--unknown_image_path', type=str, default=None)
 parser.add_argument('--names', nargs='+', default=None)
-parser.add_argument('--video', type=bool, default=False)
+parser.add_argument('--video', type=bool, default=True)
 args = parser.parse_args()
 
 if args.video:
@@ -49,9 +49,9 @@ def image_encoding(path):
 
 def classify_with_video():
 
-    known_face_encodings = image_encoding(args.image_dir)
+    known_face_encodings, known_face_names = image_encoding(args.image_dir)
 
-    known_face_names = args.names
+
 
     process_this_frame = True
 
